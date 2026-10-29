@@ -100,14 +100,14 @@
     box-shadow: 0 0 20px #00c3ff, 0 4px 10px rgba(0,0,0,0.5);
   }
 
-  @keyframes reachPulse {
+@keyframes reachPulse {
     0%, 100% {
       transform: scale(1);
-      opacity: 1;
+      filter: brightness(1);
     }
     50% {
       transform: scale(1.03);
-      opacity: 0.55; /* ゆっくり暗くなって点滅 */
+      filter: brightness(1.6); /* ★数値を上げるとより白く光ります */
     }
   }
 
