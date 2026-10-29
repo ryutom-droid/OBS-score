@@ -39,7 +39,7 @@
     background: #44475a;
     border: none;
     color: #fff;
-    padding: 7px 10px;
+    padding: 8px 10px;
     border-radius: 4px;
     font-weight: bold;
     cursor: pointer;
@@ -56,7 +56,7 @@
     border-radius: 4px;
     font-size: 11px;
     color: #bd93f9;
-    line-height: 1.4;
+    line-height: 1.5;
   }
 </style>
 </head>
@@ -87,9 +87,9 @@
 
   <div class="guide">
     <b>⌨️ キーボード操作:</b><br>
-    P1加算: [ <b>:</b> ] / P1減算: [ <b>@</b> ]<br>
-    P2加算: [ <b>]</b> ] / P2減算: [ <b>[</b> ]<br>
-    リセット: [ <b>\</b> ] (または ￥)
+    P1: 加算 [ <b>:</b> ] / 減算 [ <b>@</b> ]<br>
+    P2: 加算 [ <b>]</b> ] / 減算 [ <b>[</b> ]<br>
+    リセット: [ <b>\</b> ] または [ <b>￥</b> ]
   </div>
 
 <script>
@@ -107,8 +107,7 @@
     state.p1_name = document.getElementById('p1_name').value || 'Player 1';
     state.p2_name = document.getElementById('p2_name').value || 'Player 2';
     state.target = parseInt(document.getElementById('target').value) || 3;
-    
-    // BroadcastChannel と localStorage の両方で送信して二重化
+
     channel.postMessage(state);
     localStorage.setItem('obs_score_state', JSON.stringify(state));
   }
@@ -125,17 +124,32 @@
     sendData();
   }
 
-  // キーボード受付
+  // ★JIS/US配列、ブラウザ判定差異をすべて網羅したキー受付
   window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
-    if (e.key === ':' || e.code === 'Quote') changeScore('p1', 1);
-    if (e.key === '@' || e.code === 'BracketLeft') changeScore('p1', -1);
-    if (e.key === ']' || e.code === 'BracketRight') changeScore('p2', 1);
-    if (e.key === '[' || e.code === 'Backslash') changeScore('p2', -1);
-    if (e.key === '\\' || e.key === '¥' || e.code === 'IntlYen') resetAll();
+
+    // P1 加算 (:)
+    if (e.key === ':' || e.key === '*' || e.code === 'Quote') {
+      changeScore('p1', 1);
+    }
+    // P1 減算 (@)
+    else if (e.key === '@' || e.code === 'BracketLeft') {
+      changeScore('p1', -1);
+    }
+    // P2 加算 (])
+    else if (e.key === ']' || e.key === '}' || e.code === 'BracketRight' || e.code === 'Backslash') {
+      changeScore('p2', 1);
+    }
+    // P2 減算 ([)
+    else if (e.key === '[' || e.key === '{' || e.code === 'IntlRo' || e.code === 'Equal') {
+      changeScore('p2', -1);
+    }
+    // リセット (\ または ¥)
+    else if (e.key === '\\' || e.key === '¥' || e.code === 'IntlYen') {
+      resetAll();
+    }
   });
 
-  // 起動時に現在のデータを送信
   setTimeout(sendData, 300);
 </script>
 </body>
