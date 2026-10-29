@@ -104,12 +104,20 @@
   };
 
   function sendData() {
-    state.p1_name = document.getElementById('p1_name').value || 'Player 1';
-    state.p2_name = document.getElementById('p2_name').value || 'Player 2';
-    state.target = parseInt(document.getElementById('target').value) || 3;
+    const elP1 = document.getElementById('p1_name');
+    const elP2 = document.getElementById('p2_name');
+    const elTarget = document.getElementById('target');
 
-    channel.postMessage(state);
-    localStorage.setItem('obs_score_state', JSON.stringify(state));
+    if (elP1) state.p1_name = elP1.value || 'Player 1';
+    if (elP2) state.p2_name = elP2.value || 'Player 2';
+    if (elTarget) state.target = parseInt(elTarget.value, 10) || 3;
+
+    try {
+      channel.postMessage(state);
+      localStorage.setItem('obs_score_state', JSON.stringify(state));
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   function changeScore(side, delta) {
@@ -124,37 +132,40 @@
     sendData();
   }
 
-  // キー入力処理
   window.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT') return;
+    if (e.target && e.target.tagName === 'INPUT') return;
 
-    // --- P1 (赤) ---
-    // 加算: [ : ]
+    // P1 加算 (:)
     if (e.key === ':' || e.key === '*' || (e.code === 'Quote' && !e.shiftKey)) {
+      e.preventDefault();
       changeScore('p1', 1);
     }
-    // 減算: [ @ ]
+    // P1 減算 (@)
     else if (e.key === '@' || e.key === '`' || (e.code === 'BracketLeft' && !e.shiftKey)) {
+      e.preventDefault();
       changeScore('p1', -1);
     }
-
-    // --- P2 (青) ---
-    // 加算: [ ] ] (閉じ角括弧)
+    // P2 加算 (])
     else if (e.key === ']' || (e.code === 'Backslash' && !e.shiftKey)) {
+      e.preventDefault();
       changeScore('p2', 1);
     }
-    // 減算: [ [ ] (開き角括弧)
+    // P2 減算 ([)
     else if (e.key === '[' || (e.code === 'BracketRight' && !e.shiftKey)) {
+      e.preventDefault();
       changeScore('p2', -1);
     }
-
-    // --- リセット ---
-    // [ \ ] または [ ¥ ]
+    // リセット (\ または ¥)
     else if (e.key === '\\' || e.key === '¥' || e.code === 'IntlYen') {
+      e.preventDefault();
       resetAll();
     }
   });
 
+  // 起動時に初期値を送信
+  window.addEventListener('DOMContentLoaded', () => {
+    sendData();
+  });
   setTimeout(sendData, 300);
 </script>
 </body>
