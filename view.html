@@ -19,7 +19,7 @@
     overflow: hidden;
   }
 
-  /* ★ 横3：縦2の比率（270px × 180px）で数字まわりに広い余白を確保 */
+  /* ★ 横3：縦2の比率（270px × 180px） */
   .card {
     position: relative;
     display: flex;
@@ -57,7 +57,6 @@
     text-align: center;
   }
 
-  /* 数字の上下まわりにしっかり空間を配置 */
   .score {
     font-size: 88px;
     color: #ffffff;
@@ -69,7 +68,7 @@
     text-align: center;
   }
 
-  /* MATCH POINT / WINNER バッジ（横幅に合わせたサイズ感） */
+  /* MATCH POINT / WINNER バッジ */
   .badge {
     position: absolute;
     top: -24px;
@@ -225,3 +224,6 @@
 
   const saved = localStorage.getItem('obs_score_state');
   if (saved) render(JSON.parse(saved));
+</script>
+</body>
+</html>
