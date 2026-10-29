@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=M+PLUS+1p:wght@800&display=swap');
+
+  body {
+    margin: 0;
+    padding: 30px 20px;
+    background: transparent;
+    font-family: 'Montserrat', 'M PLUS 1p', sans-serif;
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(20,20,25,0.95), rgba(10,10,15,0.98));
+    padding: 16px 36px;
+    border-radius: 16px;
+    min-width: 160px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  /* P1：レッド */
+  .p1-card { border: 4px solid #ff2a5f; }
+  .p1-card .name { color: #ff5e83; }
+
+  /* P2：ブルー */
+  .p2-card { border: 4px solid #00c3ff; }
+  .p2-card .name { color: #6be0ff; }
+
+  .name {
+    font-size: 24px;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .score {
+    font-size: 76px;
+    color: #ffffff;
+    line-height: 1;
+    font-weight: 900;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+    transition: transform 0.2s ease;
+  }
+
+  .badge {
+    position: absolute;
+    top: -14px;
+    padding: 3px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    display: none;
+    transform: scale(0.8);
+  }
+
+  /* ★リーチ演出（赤/青 ネオン点滅） */
+  .reach { animation: reachPulse 1.5s infinite ease-in-out; }
+  .p1-card.reach { box-shadow: 0 0 35px rgba(255, 42, 95, 0.8); }
+  .p1-card.reach .badge { display: block; background: #ff2a5f; color: #fff; box-shadow: 0 0 12px #ff2a5f; }
+  .p2-card.reach { box-shadow: 0 0 35px rgba(0, 195, 255, 0.8); }
+  .p2-card.reach .badge { display: block; background: #00c3ff; color: #000; box-shadow: 0 0 12px #00c3ff; }
+  @keyframes reachPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.75; } }
+
+  /* ★確定演出（WINNER：黄金発光＆拡大） */
+  .win { animation: winGlow 1.2s infinite alternate ease-in-out; z-index: 10; }
+  .p1-card.win { border-color: #ffd700; background: linear-gradient(135deg, rgba(60,20,30,0.95), rgba(20,5,10,0.98)); }
+  .p2-card.win { border-color: #ffd700; background: linear-gradient(135deg, rgba(15,35,60,0.95), rgba(5,10,20,0.98)); }
+  .win .badge { display: block; background: #ffd700; color: #000; box-shadow: 0 0 20px #ffd700; }
+  @keyframes winGlow { from { transform: scale(1.1); box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); } to { transform: scale(1.14); box-shadow: 0 0 55px rgba(255, 215, 0, 1), 0 0 85px rgba(255, 255, 255, 0.9); } }
+
+  .loser { opacity: 0.45; transform: scale(0.92); filter: grayscale(40%); }
+</style>
+</head>
+<body>
+
+  <!-- P1 -->
+  <div class="card p1-card" id="card-p1">
+    <div class="badge" id="badge-p1">MATCH POINT</div>
+    <div class="name" id="name-p1">Player 1</div>
+    <div class="score" id="score-p1">0</div>
+  </div>
+
+  <!-- P2 -->
+  <div class="card p2-card" id="card-p2">
+    <div class="badge" id="badge-p2">MATCH POINT</div>
+    <div class="name" id="name-p2">Player 2</div>
+    <div class="score" id="score-p2">0</div>
+  </div>
+
+<script>
+  const channel = new BroadcastChannel('custom_scoreboard_channel');
+
+  function render(d) {
+    if (!d) return;
+    document.getElementById('name-p1').innerText = d.p1_name || 'Player 1';
+    document.getElementById('name-p2').innerText = d.p2_name || 'Player 2';
+    document.getElementById('score-p1').innerText = d.p1 ?? 0;
+    document.getElementById('score-p2').innerText = d.p2 ?? 0;
+
+    setState('p1', d.p1 ?? 0, d.p2 ?? 0, d.target || 3);
+    setState('p2', d.p2 ?? 0, d.p1 ?? 0, d.target || 3);
+  }
+
+  function setState(side, score, oppScore, target) {
+    const card = document.getElementById('card-' + side);
+    const badge = document.getElementById('badge-' + side);
+    card.classList.remove('reach', 'win', 'loser');
+
+    if (score >= target) {
+      card.classList.add('win');
+      badge.innerText = 'WINNER!';
+    } else if (oppScore >= target) {
+      card.classList.add('loser');
+    } else if (score === target - 1 && target > 1) {
+      card.classList.add('reach');
+      badge.innerText = 'MATCH POINT';
+    }
+  }
+
+  // 受信1：BroadcastChannel
+  channel.onmessage = (e) => {
+    render(e.data);
+  };
+
+  // 受信2：localStorage監視（バックアップ）
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'obs_score_state') {
+      render(JSON.parse(e.newValue));
+    }
+  });
+
+  // 初回読み込み
+  const saved = localStorage.getItem('obs_score_state');
+  if (saved) render(JSON.parse(saved));
+</script>
+</body>
+</html>

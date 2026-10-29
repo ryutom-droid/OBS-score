@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  body {
+    margin: 0;
+    padding: 12px;
+    background: #1e1f29;
+    color: #f8f8f2;
+    font-family: 'Segoe UI', Meiryo, sans-serif;
+    font-size: 13px;
+    user-select: none;
+  }
+  .row {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  label { font-weight: bold; }
+  input[type="text"], input[type="number"] {
+    background: #282a36;
+    border: 1px solid #44475a;
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 4px;
+    width: 130px;
+    box-sizing: border-box;
+    outline: none;
+  }
+  input[type="number"] { width: 60px; text-align: center; }
+  .score-ctrl {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  button {
+    background: #44475a;
+    border: none;
+    color: #fff;
+    padding: 7px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.1s;
+  }
+  button:hover { background: #6272a4; }
+  button:active { transform: scale(0.96); }
+  .btn-reset { width: 100%; margin-top: 8px; background: #ff5555; }
+  .btn-reset:hover { background: #ff6e6e; }
+  .guide {
+    margin-top: 10px;
+    padding: 8px;
+    background: #282a36;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #bd93f9;
+    line-height: 1.4;
+  }
+</style>
+</head>
+<body>
+
+  <div class="row">
+    <label style="color:#ff5e83;">P1 (赤):</label>
+    <input type="text" id="p1_name" value="Player 1" oninput="sendData()">
+  </div>
+  <div class="row">
+    <label style="color:#6be0ff;">P2 (青):</label>
+    <input type="text" id="p2_name" value="Player 2" oninput="sendData()">
+  </div>
+  <div class="row">
+    <label>勝利点数 (確定):</label>
+    <input type="number" id="target" value="3" min="1" oninput="sendData()">
+  </div>
+
+  <div class="score-ctrl">
+    <button style="flex:1; border-bottom: 3px solid #ff2a5f;" onclick="changeScore('p1', 1)">P1 +1 (:)</button>
+    <button style="flex:1;" onclick="changeScore('p1', -1)">P1 -1 (@)</button>
+  </div>
+  <div class="score-ctrl">
+    <button style="flex:1; border-bottom: 3px solid #00c3ff;" onclick="changeScore('p2', 1)">P2 +1 (])</button>
+    <button style="flex:1;" onclick="changeScore('p2', -1)">P2 -1 ([)</button>
+  </div>
+  <button class="btn-reset" onclick="resetAll()">スコアリセット (\)</button>
+
+  <div class="guide">
+    <b>⌨️ キーボード操作:</b><br>
+    P1加算: [ <b>:</b> ] / P1減算: [ <b>@</b> ]<br>
+    P2加算: [ <b>]</b> ] / P2減算: [ <b>[</b> ]<br>
+    リセット: [ <b>\</b> ] (または ￥)
+  </div>
+
+<script>
+  const channel = new BroadcastChannel('custom_scoreboard_channel');
+
+  let state = {
+    p1: 0,
+    p2: 0,
+    p1_name: 'Player 1',
+    p2_name: 'Player 2',
+    target: 3
+  };
+
+  function sendData() {
+    state.p1_name = document.getElementById('p1_name').value || 'Player 1';
+    state.p2_name = document.getElementById('p2_name').value || 'Player 2';
+    state.target = parseInt(document.getElementById('target').value) || 3;
+    
+    // BroadcastChannel と localStorage の両方で送信して二重化
+    channel.postMessage(state);
+    localStorage.setItem('obs_score_state', JSON.stringify(state));
+  }
+
+  function changeScore(side, delta) {
+    if (side === 'p1') state.p1 = Math.max(0, state.p1 + delta);
+    if (side === 'p2') state.p2 = Math.max(0, state.p2 + delta);
+    sendData();
+  }
+
+  function resetAll() {
+    state.p1 = 0;
+    state.p2 = 0;
+    sendData();
+  }
+
+  // キーボード受付
+  window.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === ':' || e.code === 'Quote') changeScore('p1', 1);
+    if (e.key === '@' || e.code === 'BracketLeft') changeScore('p1', -1);
+    if (e.key === ']' || e.code === 'BracketRight') changeScore('p2', 1);
+    if (e.key === '[' || e.code === 'Backslash') changeScore('p2', -1);
+    if (e.key === '\\' || e.key === '¥' || e.code === 'IntlYen') resetAll();
+  });
+
+  // 起動時に現在のデータを送信
+  setTimeout(sendData, 300);
+</script>
+</body>
+</html>
