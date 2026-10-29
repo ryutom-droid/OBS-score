@@ -124,27 +124,32 @@
     sendData();
   }
 
-  // ★JIS/US配列、ブラウザ判定差異をすべて網羅したキー受付
+  // キー入力処理
   window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
 
-    // P1 加算 (:)
-    if (e.key === ':' || e.key === '*' || e.code === 'Quote') {
+    // --- P1 (赤) ---
+    // 加算: [ : ]
+    if (e.key === ':' || e.key === '*' || (e.code === 'Quote' && !e.shiftKey)) {
       changeScore('p1', 1);
     }
-    // P1 減算 (@)
-    else if (e.key === '@' || e.code === 'BracketLeft') {
+    // 減算: [ @ ]
+    else if (e.key === '@' || e.key === '`' || (e.code === 'BracketLeft' && !e.shiftKey)) {
       changeScore('p1', -1);
     }
-    // P2 加算 (])
-    else if (e.key === ']' || e.key === '}' || e.code === 'BracketRight' || e.code === 'Backslash') {
+
+    // --- P2 (青) ---
+    // 加算: [ ] ] (閉じ角括弧)
+    else if (e.key === ']' || (e.code === 'Backslash' && !e.shiftKey)) {
       changeScore('p2', 1);
     }
-    // P2 減算 ([)
-    else if (e.key === '[' || e.key === '{' || e.code === 'IntlRo' || e.code === 'Equal') {
+    // 減算: [ [ ] (開き角括弧)
+    else if (e.key === '[' || (e.code === 'BracketRight' && !e.shiftKey)) {
       changeScore('p2', -1);
     }
-    // リセット (\ または ¥)
+
+    // --- リセット ---
+    // [ \ ] または [ ¥ ]
     else if (e.key === '\\' || e.key === '¥' || e.code === 'IntlYen') {
       resetAll();
     }
