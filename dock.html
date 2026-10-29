@@ -155,8 +155,8 @@
       e.preventDefault();
       changeScore('p2', -1);
     }
-    // リセット (\ または ¥)
-    else if (e.key === '\\' || e.key === '¥' || e.code === 'IntlYen') {
+// リセット (^)
+    else if (e.key === '^' || e.key === '~' || e.code === 'Equal') {
       e.preventDefault();
       resetAll();
     }
