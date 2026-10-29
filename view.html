@@ -5,14 +5,13 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Noto+Sans+JP:wght@900&display=swap');
 
-  /* 光の見切れを防ぐため上下余白を確保しつつ、中央揃えを維持 */
   body {
     margin: 0;
-    padding: 90px 20px;
+    padding: 100px 30px;
     background: transparent;
     font-family: 'Montserrat', 'Noto Sans JP', sans-serif;
     display: flex;
-    gap: 50px;
+    gap: 60px;
     justify-content: center;
     align-items: center;
     width: 100vw;
@@ -20,6 +19,7 @@
     overflow: hidden;
   }
 
+  /* ★ 横3：縦2の比率（270px × 180px）で数字まわりに広い余白を確保 */
   .card {
     position: relative;
     display: flex;
@@ -27,10 +27,11 @@
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, rgba(20,20,25,0.95), rgba(10,10,15,0.98));
-    padding: 24px 36px 18px 36px;
-    border-radius: 18px;
-    min-width: 200px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    width: 270px;
+    height: 180px;
+    padding: 16px 20px 10px 20px;
+    border-radius: 20px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.85);
     transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-sizing: border-box;
   }
@@ -44,59 +45,61 @@
   .p2-card .name { color: #6be0ff; }
 
   .name {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 900;
     letter-spacing: 1px;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
     text-shadow: 0 2px 6px rgba(0,0,0,0.9);
-    max-width: 200px;
+    max-width: 230px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     text-align: center;
   }
 
+  /* 数字の上下まわりにしっかり空間を配置 */
   .score {
-    font-size: 84px;
+    font-size: 88px;
     color: #ffffff;
     line-height: 1;
     font-weight: 900;
-    text-shadow: 0 4px 12px rgba(0,0,0,0.9);
+    margin-top: 4px;
+    text-shadow: 0 4px 14px rgba(0,0,0,0.9);
     transition: transform 0.2s ease;
     text-align: center;
   }
 
-  /* ★MATCH POINT / WINNER バッジ */
+  /* MATCH POINT / WINNER バッジ（横幅に合わせたサイズ感） */
   .badge {
     position: absolute;
     top: -24px;
-    left: 8px;
-    right: 8px;
-    padding: 5px 0;
+    left: 14px;
+    right: 14px;
+    padding: 6px 0;
     border-radius: 8px;
     font-size: 16px;
     font-weight: 900;
-    letter-spacing: 2px;
+    letter-spacing: 2.5px;
     text-align: center;
     display: none;
     box-sizing: border-box;
     text-transform: uppercase;
   }
 
-  /* ★リーチ演出 */
+  /* リーチ演出 */
   .reach {
     animation: reachPulse 2.4s infinite ease-in-out;
   }
 
   .p1-card.reach {
-    box-shadow: 0 0 20px #ff2a5f, 0 0 50px rgba(255, 42, 95, 1), 0 0 80px rgba(255, 100, 150, 0.8);
+    box-shadow: 0 0 20px #ff2a5f, 0 0 50px rgba(255, 42, 95, 1), 0 0 85px rgba(255, 100, 150, 0.85);
     border-color: #ff5e83;
   }
   .p1-card.reach .badge {
     display: block;
     background: linear-gradient(90deg, #ff0044, #ff4d79);
     color: #ffffff;
-    box-shadow: 0 0 20px #ff2a5f, 0 4px 10px rgba(0,0,0,0.5);
+    box-shadow: 0 0 22px #ff2a5f, 0 4px 12px rgba(0,0,0,0.5);
   }
 
   .p2-card.reach {
@@ -106,7 +109,7 @@
     display: block;
     background: linear-gradient(90deg, #0099ff, #4dd2ff);
     color: #000000;
-    box-shadow: 0 0 20px #00c3ff, 0 4px 10px rgba(0,0,0,0.5);
+    box-shadow: 0 0 22px #00c3ff, 0 4px 12px rgba(0,0,0,0.5);
   }
 
   @keyframes reachPulse {
@@ -120,7 +123,7 @@
     }
   }
 
-  /* ★確定演出（WINNER） */
+  /* 確定演出（WINNER） */
   .win {
     animation: winExplosion 1.4s infinite alternate ease-in-out;
     z-index: 10;
@@ -222,6 +225,3 @@
 
   const saved = localStorage.getItem('obs_score_state');
   if (saved) render(JSON.parse(saved));
-</script>
-</body>
-</html>
