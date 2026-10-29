@@ -5,6 +5,10 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Noto+Sans+JP:wght@900&display=swap');
 
+  * {
+    box-sizing: border-box;
+  }
+
   body {
     margin: 0;
     padding: 100px 30px;
@@ -15,11 +19,10 @@
     justify-content: center;
     align-items: center;
     width: 100vw;
-    box-sizing: border-box;
     overflow: hidden;
   }
 
-  /* ★ 横3：縦2の比率（270px × 180px） */
+  /* 横3：縦2の比率（270px × 180px） */
   .card {
     position: relative;
     display: flex;
@@ -33,7 +36,6 @@
     border-radius: 20px;
     box-shadow: 0 12px 32px rgba(0,0,0,0.85);
     transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-sizing: border-box;
   }
 
   /* P1：レッド */
@@ -81,7 +83,6 @@
     letter-spacing: 2.5px;
     text-align: center;
     display: none;
-    box-sizing: border-box;
     text-transform: uppercase;
   }
 
@@ -187,22 +188,34 @@
   </div>
 
 <script>
-  const channel = new BroadcastChannel('custom_scoreboard_channel');
+  var channel = new BroadcastChannel('custom_scoreboard_channel');
 
   function render(d) {
     if (!d) return;
-    document.getElementById('name-p1').innerText = d.p1_name || 'Player 1';
-    document.getElementById('name-p2').innerText = d.p2_name || 'Player 2';
-    document.getElementById('score-p1').innerText = d.p1 ?? 0;
-    document.getElementById('score-p2').innerText = d.p2 ?? 0;
 
-    setState('p1', d.p1 ?? 0, d.p2 ?? 0, d.target || 3);
-    setState('p2', d.p2 ?? 0, d.p1 ?? 0, d.target || 3);
+    var nameP1 = document.getElementById('name-p1');
+    var nameP2 = document.getElementById('name-p2');
+    var scoreP1 = document.getElementById('score-p1');
+    var scoreP2 = document.getElementById('score-p2');
+
+    var p1Score = (typeof d.p1 === 'number') ? d.p1 : 0;
+    var p2Score = (typeof d.p2 === 'number') ? d.p2 : 0;
+    var target = (typeof d.target === 'number' && d.target > 0) ? d.target : 3;
+
+    if (nameP1) nameP1.innerText = d.p1_name || 'Player 1';
+    if (nameP2) nameP2.innerText = d.p2_name || 'Player 2';
+    if (scoreP1) scoreP1.innerText = p1Score;
+    if (scoreP2) scoreP2.innerText = p2Score;
+
+    setState('p1', p1Score, p2Score, target);
+    setState('p2', p2Score, p1Score, target);
   }
 
   function setState(side, score, oppScore, target) {
-    const card = document.getElementById('card-' + side);
-    const badge = document.getElementById('badge-' + side);
+    var card = document.getElementById('card-' + side);
+    var badge = document.getElementById('badge-' + side);
+    if (!card || !badge) return;
+
     card.classList.remove('reach', 'win', 'loser');
 
     if (score >= target) {
@@ -210,20 +223,30 @@
       badge.innerText = '★ WINNER ★';
     } else if (oppScore >= target) {
       card.classList.add('loser');
-    } else if (score === target - 1 && target > 1) {
+    } else if (score === (target - 1) && target > 1) {
       card.classList.add('reach');
       badge.innerText = 'MATCH POINT';
     }
   }
 
-  channel.onmessage = (e) => { render(e.data); };
+  channel.onmessage = function(e) {
+    render(e.data);
+  };
 
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'obs_score_state') render(JSON.parse(e.newValue));
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'obs_score_state' && e.newValue) {
+      try {
+        render(JSON.parse(e.newValue));
+      } catch (err) {}
+    }
   });
 
-  const saved = localStorage.getItem('obs_score_state');
-  if (saved) render(JSON.parse(saved));
+  try {
+    var saved = localStorage.getItem('obs_score_state');
+    if (saved) {
+      render(JSON.parse(saved));
+    }
+  } catch (err) {}
 </script>
 </body>
 </html>
