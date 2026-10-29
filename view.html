@@ -5,13 +5,14 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=M+PLUS+1p:wght@800&display=swap');
 
+  /* 光のグラデーションや拡大アニメーションが途中で切れないよう、余白（padding）を大きく確保 */
   body {
     margin: 0;
-    padding: 30px 20px;
+    padding: 70px 40px;
     background: transparent;
     font-family: 'Montserrat', 'M PLUS 1p', sans-serif;
     display: flex;
-    gap: 40px;
+    gap: 60px;
     justify-content: center;
     align-items: center;
     overflow: hidden;
@@ -23,11 +24,11 @@
     flex-direction: column;
     align-items: center;
     background: linear-gradient(135deg, rgba(20,20,25,0.95), rgba(10,10,15,0.98));
-    padding: 16px 36px;
-    border-radius: 16px;
-    min-width: 160px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding: 24px 36px 18px 36px;
+    border-radius: 18px;
+    min-width: 200px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
   /* P1：レッド */
@@ -42,50 +43,120 @@
     font-size: 24px;
     letter-spacing: 1px;
     margin-bottom: 6px;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.8);
-    max-width: 180px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+    max-width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .score {
-    font-size: 76px;
+    font-size: 84px;
     color: #ffffff;
     line-height: 1;
     font-weight: 900;
-    text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+    text-shadow: 0 4px 12px rgba(0,0,0,0.9);
     transition: transform 0.2s ease;
   }
 
+  /* ★MATCH POINT / WINNER バッジ（枠の横幅いっぱいに拡大） */
   .badge {
     position: absolute;
-    top: -14px;
-    padding: 3px 12px;
-    border-radius: 10px;
-    font-size: 13px;
+    top: -24px;
+    left: 8px;
+    right: 8px;
+    padding: 5px 0;
+    border-radius: 8px;
+    font-size: 16px;
     font-weight: 900;
-    letter-spacing: 1.5px;
+    letter-spacing: 2px;
+    text-align: center;
     display: none;
-    transform: scale(0.8);
+    box-sizing: border-box;
+    text-transform: uppercase;
   }
 
-  /* ★リーチ演出（赤/青 ネオン点滅） */
-  .reach { animation: reachPulse 1.5s infinite ease-in-out; }
-  .p1-card.reach { box-shadow: 0 0 35px rgba(255, 42, 95, 0.8); }
-  .p1-card.reach .badge { display: block; background: #ff2a5f; color: #fff; box-shadow: 0 0 12px #ff2a5f; }
-  .p2-card.reach { box-shadow: 0 0 35px rgba(0, 195, 255, 0.8); }
-  .p2-card.reach .badge { display: block; background: #00c3ff; color: #000; box-shadow: 0 0 12px #00c3ff; }
-  @keyframes reachPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.75; } }
+  /* ★リーチ演出：ゆっくりじんわりと点滅（周期を2.4秒に延長） */
+  .reach {
+    animation: reachPulse 2.4s infinite ease-in-out;
+  }
+  .p1-card.reach {
+    box-shadow: 0 0 45px rgba(255, 42, 95, 0.85);
+  }
+  .p1-card.reach .badge {
+    display: block;
+    background: linear-gradient(90deg, #ff0044, #ff4d79);
+    color: #ffffff;
+    box-shadow: 0 0 20px #ff2a5f, 0 4px 10px rgba(0,0,0,0.5);
+  }
 
-  /* ★確定演出（WINNER：黄金発光＆拡大） */
-  .win { animation: winGlow 1.2s infinite alternate ease-in-out; z-index: 10; }
-  .p1-card.win { border-color: #ffd700; background: linear-gradient(135deg, rgba(60,20,30,0.95), rgba(20,5,10,0.98)); }
-  .p2-card.win { border-color: #ffd700; background: linear-gradient(135deg, rgba(15,35,60,0.95), rgba(5,10,20,0.98)); }
-  .win .badge { display: block; background: #ffd700; color: #000; box-shadow: 0 0 20px #ffd700; }
-  @keyframes winGlow { from { transform: scale(1.1); box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); } to { transform: scale(1.14); box-shadow: 0 0 55px rgba(255, 215, 0, 1), 0 0 85px rgba(255, 255, 255, 0.9); } }
+  .p2-card.reach {
+    box-shadow: 0 0 45px rgba(0, 195, 255, 0.85);
+  }
+  .p2-card.reach .badge {
+    display: block;
+    background: linear-gradient(90deg, #0099ff, #4dd2ff);
+    color: #000000;
+    box-shadow: 0 0 20px #00c3ff, 0 4px 10px rgba(0,0,0,0.5);
+  }
 
-  .loser { opacity: 0.45; transform: scale(0.92); filter: grayscale(40%); }
+  @keyframes reachPulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.03);
+      opacity: 0.55; /* ゆっくり暗くなって点滅 */
+    }
+  }
+
+  /* ★確定演出（WINNER：超激しい黄金ネオン＆衝撃波アニメーション） */
+  .win {
+    animation: winExplosion 1.4s infinite alternate ease-in-out;
+    z-index: 10;
+  }
+  .p1-card.win {
+    border-color: #ffd700;
+    background: linear-gradient(135deg, rgba(80, 20, 30, 0.98), rgba(20, 5, 10, 0.98));
+  }
+  .p2-card.win {
+    border-color: #ffd700;
+    background: linear-gradient(135deg, rgba(15, 45, 80, 0.98), rgba(5, 10, 20, 0.98));
+  }
+  .win .name {
+    color: #fff2a3 !important;
+  }
+  .win .score {
+    color: #ffffff;
+    text-shadow: 0 0 20px #ffd700, 0 0 40px #ffae00;
+  }
+  .win .badge {
+    display: block;
+    background: linear-gradient(90deg, #ffb700, #ffe600, #ffb700);
+    color: #000000;
+    font-size: 18px;
+    letter-spacing: 3px;
+    box-shadow: 0 0 25px #ffd700, 0 0 50px rgba(255, 215, 0, 0.8);
+  }
+
+  @keyframes winExplosion {
+    0% {
+      transform: scale(1.08);
+      box-shadow: 0 0 40px rgba(255, 215, 0, 0.8), 0 0 70px rgba(255, 150, 0, 0.5);
+    }
+    100% {
+      transform: scale(1.15);
+      box-shadow: 0 0 70px rgba(255, 215, 0, 1), 0 0 120px rgba(255, 230, 100, 0.9), 0 0 160px rgba(255, 100, 0, 0.6);
+    }
+  }
+
+  /* 敗者側のフェードアウト */
+  .loser {
+    opacity: 0.35;
+    transform: scale(0.92);
+    filter: grayscale(60%);
+  }
 </style>
 </head>
 <body>
@@ -125,7 +196,7 @@
 
     if (score >= target) {
       card.classList.add('win');
-      badge.innerText = 'WINNER!';
+      badge.innerText = '★ WINNER ★';
     } else if (oppScore >= target) {
       card.classList.add('loser');
     } else if (score === target - 1 && target > 1) {
@@ -134,19 +205,12 @@
     }
   }
 
-  // 受信1：BroadcastChannel
-  channel.onmessage = (e) => {
-    render(e.data);
-  };
+  channel.onmessage = (e) => { render(e.data); };
 
-  // 受信2：localStorage監視（バックアップ）
   window.addEventListener('storage', (e) => {
-    if (e.key === 'obs_score_state') {
-      render(JSON.parse(e.newValue));
-    }
+    if (e.key === 'obs_score_state') render(JSON.parse(e.newValue));
   });
 
-  // 初回読み込み
   const saved = localStorage.getItem('obs_score_state');
   if (saved) render(JSON.parse(saved));
 </script>
